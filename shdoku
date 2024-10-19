@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+
+readonly X_PHYSICAL_END=17
+readonly Y_PHYSICAL_END=11
+
+x_physical_current=1
+y_physical_current=1
+
+clear_screen() {
+  echo -n -e '\033[H\033[2J\c'
+}
+
+print_grid() {
+  cat << 'EOF'
+. . .|. . .|. . .
+. . .|. . .|. . .
+. . .|. . .|. . .
+-----|-----|-----
+. . .|. . .|. . .
+. . .|. . .|. . .
+. . .|. . .|. . .
+-----|-----|-----
+. . .|. . .|. . .
+. . .|. . .|. . .
+. . .|. . .|. . .
+EOF
+}
+
+move_cursor() {
+  x_physical_current=$1
+  y_physical_current=$2
+  echo -e "\033[${2};${1}H\c"
+}
+
+move_cursor_down() {
+  if (( y_physical_current == Y_PHYSICAL_END )); then
+    return
+  elif (( y_physical_current == 3 )) || (( y_current == 7 )); then
+    # to go over split-line
+    y=$((y_physical_current + 2))
+  else
+    y=$((y_physical_current + 1))
+  fi
+  move_cursor $x_physical_current $y
+}
+
+go_down() {
+  move_cursor_down
+}
+
+move_cursor_up() {
+  if (( y_physical_current == 1 )); then
+    return
+  elif (( y_physical_current == 5 )) || (( y_current == 9 )); then
+    # to go over split-line
+    y=$((y_physical_current - 2))
+  else
+    y=$((y_physical_current - 1))
+  fi
+  move_cursor $x_physical_current $y
+}
+
+go_up() {
+  move_cursor_up
+}
+
+move_cursor_left() {
+  (( x_physical_current == 1 )) && return
+  move_cursor $((x_physical_current - 2)) $y_physical_current
+}
+
+go_left() {
+  move_cursor_left
+}
+
+move_cursor_right() {
+  (( x_physical_current == X_PHYSICAL_END )) && return
+  move_cursor $((x_physical_current + 2)) $y_physical_current
+}
+
+go_right() {
+  move_cursor_right
+}
+
+read_char() {
+  dd bs=1 count=1 2> /dev/null
+}
+
+init_terminal() {
+  # Disable echo-back, buffering
+  stty -echo -icanon min 1
+}
+
+reset_terminal() {
+  # Enable echo-back, buffering
+  # TODO: reset back to original state
+  stty echo icanon
+}
+
+init() {
+  init_terminal
+  clear_screen
+  print_grid
+  move_cursor 1 1
+}
+
+quit() {
+  clear_screen
+  reset_terminal
+  exit 0
+}
+
+init
+
+while :; do
+  c=$(read_char)
+  case "$c" in
+    j) go_down ;;
+    k) go_up ;;
+    h) go_left ;;
+    l) go_right ;;
+    q) quit ;;
+  esac
+done
