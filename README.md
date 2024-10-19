@@ -1,0 +1,2 @@
+# shdoku
+Sudoku in bash
