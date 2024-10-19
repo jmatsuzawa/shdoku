@@ -86,6 +86,16 @@ read_char() {
   dd bs=1 count=1 2> /dev/null
 }
 
+set_number() {
+  echo -n $1
+  move_cursor $x_physical_current $y_physical_current
+}
+
+clear_number() {
+  echo -n .
+  move_cursor $x_physical_current $y_physical_current
+}
+
 init_terminal() {
   # Disable echo-back, buffering
   stty -echo -icanon min 1
@@ -119,6 +129,8 @@ while :; do
     k) go_up ;;
     h) go_left ;;
     l) go_right ;;
+    [1-9]) set_number $c ;;
+    .) clear_number ;;
     q) quit ;;
   esac
 done
