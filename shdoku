@@ -96,19 +96,7 @@ clear_number() {
   move_cursor $x_physical_current $y_physical_current
 }
 
-init_terminal() {
-  # Disable echo-back, buffering
-  stty -echo -icanon min 1
-}
-
-reset_terminal() {
-  # Enable echo-back, buffering
-  # TODO: reset back to original state
-  stty echo icanon
-}
-
 init() {
-  init_terminal
   clear_screen
   print_grid
   move_cursor 1 1
@@ -116,20 +104,19 @@ init() {
 
 quit() {
   clear_screen
-  reset_terminal
   exit 0
 }
 
 init
 
 while :; do
-  c=$(read_char)
-  case "$c" in
+  read -s -n 1 key
+  case "$key" in
     j) go_down ;;
     k) go_up ;;
     h) go_left ;;
     l) go_right ;;
-    [1-9]) set_number $c ;;
+    [1-9]) set_number "$key" ;;
     .) clear_number ;;
     q) quit ;;
   esac
