@@ -110,6 +110,23 @@ quit() {
   exit 0
 }
 
+
+print_terminal_size_error() {
+  echo "shdoku: Your terminal is too small. shdoku requires columns >= ${X_PHYSICAL_END}, rows >= ${Y_PHYSICAL_END}" 2>&1
+}
+
+ensure_term_size() {
+  local columns=$(stty -a | sed -n 's/.*columns \([0-9]\{1,\}\).*/\1/p')
+  local rows=$(stty -a | sed -n 's/.*rows \([0-9]\{1,\}\).*/\1/p')
+
+  if (( columns < X_PHYSICAL_END )) || (( rows < Y_PHYSICAL_END )); then
+    print_terminal_size_error
+    exit 1
+  fi
+}
+
+ensure_term_size
+
 init
 
 while :; do
