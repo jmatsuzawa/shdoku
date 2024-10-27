@@ -12,22 +12,6 @@ clear_screen() {
   echo -n -e '\e[H\e[2J'
 }
 
-print_grid() {
-  cat << 'EOF'
-. . .|. . .|. . .
-. . .|. . .|. . .
-. . .|. . .|. . .
------|-----|-----
-. . .|. . .|. . .
-. . .|. . .|. . .
-. . .|. . .|. . .
------|-----|-----
-. . .|. . .|. . .
-. . .|. . .|. . .
-. . .|. . .|. . .
-EOF
-}
-
 move_cursor() {
   x_physical_current=$1
   y_physical_current=$2
@@ -89,12 +73,54 @@ set_number() {
   move_cursor $x_physical_current $y_physical_current
 }
 
+gen_problem() {
+  sample_problem=".,.,.,6,3,.,.,.,., .,8,.,.,.,2,3,1,., .,9,.,8,.,.,.,.,., .,7,.,.,.,.,6,.,9, 9,.,.,.,.,.,.,.,8, 1,.,5,.,.,.,.,4,., .,.,.,.,.,4,.,2,., .,4,6,5,.,.,.,3,., .,.,.,.,9,1,.,.,.,"
+  echo "$sample_problem"
+}
+
+init_data() {
+  IFS_BAK=$IFS
+  y=0
+  problem=$(gen_problem)
+  for row in $problem; do
+    IFS=,
+    x=0
+    for c in $row; do
+      eval values_"${y}"_"${x}"=$c
+      if [[ "$c" != '.' ]]; then
+        eval givens_"${y}"_"${x}"=yes
+      fi
+      x=$((x + 1))
+    done
+    y=$((y + 1))
+    IFS=$IFS_BAK
+  done
+}
+
 clear_number() {
   echo -n .
   move_cursor $x_physical_current $y_physical_current
 }
 
+print_grid() {
+  for y in {0..8}; do
+    for x in {0..8}; do
+      eval echo -n \$values_"${y}"_"${x}"
+      if (( x == 2 || x == 5 )); then
+        echo -n '|'
+      else
+        echo -n ' '
+      fi
+    done
+    echo
+    if (( y == 2 || y == 5 )); then
+      echo '-----|-----|-----'
+    fi
+  done
+}
+
 init() {
+  init_data
   clear_screen
   print_grid
   move_cursor 1 1
