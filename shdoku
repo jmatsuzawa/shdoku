@@ -105,7 +105,13 @@ clear_number() {
 print_grid() {
   for y in {0..8}; do
     for x in {0..8}; do
-      eval echo -n \$values_"${y}"_"${x}"
+      eval val=\$values_"${y}"_"${x}"
+      if [[ "$val" != '.' ]]; then
+        # Print underline for given numbers
+        echo -ne "\033[4m${val}\033[0m"
+      else
+        echo -n '.'
+      fi
       if (( x == 2 || x == 5 )); then
         echo -n '|'
       else
