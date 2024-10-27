@@ -89,8 +89,8 @@ set_number() {
   if [[ "$given" == yes ]]; then
     return
   fi
-  echo -n $1
-  move_cursor $x_physical_current $y_physical_current
+  # Prevent cursor move by entering multiple numbers at the same time
+  echo -e -n "${1}\033[${y_physical_current};${x_physical_current}H"
 }
 
 gen_problem() {
