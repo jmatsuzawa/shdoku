@@ -84,10 +84,6 @@ go_right() {
   move_cursor_right
 }
 
-read_char() {
-  dd bs=1 count=1 2> /dev/null
-}
-
 set_number() {
   echo -n $1
   move_cursor $x_physical_current $y_physical_current
