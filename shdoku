@@ -9,13 +9,13 @@ x_physical_current=1
 y_physical_current=1
 
 clear_screen() {
-  echo -n -e '\e[H\e[2J'
+  echo -n -e '\033[H\033[2J'
 }
 
 move_cursor() {
   x_physical_current=$1
   y_physical_current=$2
-  echo -n -e "\e[${2};${1}H"
+  echo -n -e "\033[${2};${1}H"
 }
 
 move_cursor_down() {
