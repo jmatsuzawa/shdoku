@@ -5,6 +5,8 @@ set -u
 readonly X_PHYSICAL_END=17
 readonly Y_PHYSICAL_END=11
 
+x_logical_current=0
+y_logical_current=0
 x_physical_current=1
 y_physical_current=1
 
@@ -31,6 +33,9 @@ move_cursor_down() {
 }
 
 go_down() {
+  if (( y_logical_current < 8 )); then
+    y_logical_current=$((y_logical_current + 1))
+  fi
   move_cursor_down
 }
 
@@ -47,6 +52,9 @@ move_cursor_up() {
 }
 
 go_up() {
+  if (( y_logical_current > 0 )); then
+    y_logical_current=$((y_logical_current - 1))
+  fi
   move_cursor_up
 }
 
@@ -56,6 +64,9 @@ move_cursor_left() {
 }
 
 go_left() {
+  if (( x_logical_current > 0 )); then
+    x_logical_current=$((x_logical_current - 1))
+  fi
   move_cursor_left
 }
 
@@ -65,10 +76,19 @@ move_cursor_right() {
 }
 
 go_right() {
+  if (( x_logical_current < 8 )); then
+    x_logical_current=$((x_logical_current + 1))
+  fi
   move_cursor_right
 }
 
 set_number() {
+  x=${x_logical_current}
+  y=${y_logical_current}
+  eval given=\$givens_"${y}"_"${x}"
+  if [[ "$given" == yes ]]; then
+    return
+  fi
   echo -n $1
   move_cursor $x_physical_current $y_physical_current
 }
@@ -89,6 +109,8 @@ init_data() {
       eval values_"${y}"_"${x}"=$c
       if [[ "$c" != '.' ]]; then
         eval givens_"${y}"_"${x}"=yes
+      else
+        eval givens_"${y}"_"${x}"=no
       fi
       x=$((x + 1))
     done
