@@ -82,15 +82,19 @@ go_right() {
   move_cursor_right
 }
 
-set_number() {
+set_value() {
   x=${x_logical_current}
   y=${y_logical_current}
   eval given=\$givens_"${y}"_"${x}"
   if [[ "$given" == yes ]]; then
     return
   fi
+
+  val="${1}"
+  eval values_"${y}"_"${x}"=${val}
+
   # Prevent cursor move by entering multiple numbers at the same time
-  echo -e -n "${1}\033[${y_physical_current};${x_physical_current}H"
+  echo -e -n "${val}\033[${y_physical_current};${x_physical_current}H"
 }
 
 gen_problem() {
@@ -168,8 +172,7 @@ while :; do
     k) go_up ;;
     h) go_left ;;
     l) go_right ;;
-    [1-9]) set_number "$key" ;;
-    .) clear_number ;;
+    [1-9.]) set_value "$key" ;;
     q) quit ;;
   esac
 done
