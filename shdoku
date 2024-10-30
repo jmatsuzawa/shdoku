@@ -82,6 +82,23 @@ go_right() {
   move_cursor_right
 }
 
+increment() {
+  x=${x_logical_current}
+  y=${y_logical_current}
+
+  eval value=\$values_"${y}"_"${x}"
+  if [[ "${value}" == '.' ]]; then
+    value=0
+  fi
+  value=$(( (value + 1) % 10))
+
+  if [[ "${value}" == '0' ]]; then
+    value=.
+  fi
+
+  set_value "${value}"
+}
+
 set_value() {
   x=${x_logical_current}
   y=${y_logical_current}
@@ -172,6 +189,7 @@ while :; do
     k) go_up ;;
     h) go_left ;;
     l) go_right ;;
+    i) increment ;;
     [1-9.]) set_value "$key" ;;
     q) quit ;;
   esac
